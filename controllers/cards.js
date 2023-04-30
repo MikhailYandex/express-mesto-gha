@@ -22,7 +22,7 @@ const deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.id)
     .then((data) => {
       if (!data) {
-        return res.status(400).send({ message: 'Карточки с таким id не найденo' });
+        return res.status(404).send({ message: 'Карточки с таким id не найденo' });
       }
       return res.status(200).send(data);
     })
