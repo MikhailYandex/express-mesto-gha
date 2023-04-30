@@ -19,12 +19,12 @@ const createUser = (req, res) => {
 };
 
 const findUser = (req, res) => {
-  User.findOne({ _id: req.params.userId })
+  User.findById(req.params.id)
     .then((user) => {
       if (!user) {
-        return res.status(400).send({ message: 'Пользователь не найден' });
+        return res.status(404).send({ message: 'Пользователь не найден' });
       }
-      return res.send(user);
+      return res.status(201).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
