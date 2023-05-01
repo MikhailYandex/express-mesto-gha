@@ -9,7 +9,7 @@ const getUsers = (req, res) => {
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then((data) => res.send(data))
+    .then((data) => res.status(201).send(data))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Не корректные данные' });
@@ -20,15 +20,11 @@ const createUser = (req, res) => {
 
 const findUser = (req, res) => {
   User.findById(req.params.id)
-    .then((user) => {
-      if (!user) {
-        return res.status(404).send({ message: 'Пользователь не найден' });
-      }
-      return res.send(user);
-    })
+    .orFail(new Error('notValidId'))
+    .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Некорректный id' });
+      if (err.message === 'notValidId') {
+        return res.status(404).send({ message: 'Такого пользователя не существует' });
       }
       return res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
@@ -37,15 +33,15 @@ const findUser = (req, res) => {
 const updateProfile = (req, res) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
-    .then((data) => {
-      if (!data) {
-        return res.status(404).send({ message: 'Данного профиля не существует' });
-      }
-      return res.send(data);
+    .orFail(() => {
+      throw res.status(404).send({ message: 'Данного пользователя не существует' });
     })
+    .then((data) => res.send(data))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Не корректные данные' });
+      } if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Не корректный id пользователя' });
       }
       return res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
@@ -54,15 +50,15 @@ const updateProfile = (req, res) => {
 const updateAvatar = (req, res) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
-    .then((data) => {
-      if (!data) {
-        return res.status(404).send({ message: 'Пользователь не найден' });
-      }
-      return res.send(data);
+    .orFail(() => {
+      throw res.status(404).send({ message: 'Данного пользователя не существует' });
     })
+    .then((data) => res.send(data))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Не корректные данные' });
+      } if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Не корректный id пользователя' });
       }
       return res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
