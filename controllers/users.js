@@ -20,11 +20,13 @@ const createUser = (req, res) => {
 
 const findUser = (req, res) => {
   User.findById(req.params.id)
-    .orFail(new Error('notValidId'))
+    .orFail(() => {
+      throw res.status(404).send({ message: 'Данного пользователя не существует' });
+    })
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.message === 'notValidId') {
-        return res.status(404).send({ message: 'Такого пользователя не существует' });
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Не корректный id пользователя' });
       }
       return res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
