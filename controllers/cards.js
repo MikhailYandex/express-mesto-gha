@@ -4,8 +4,8 @@ const ForbiddenError = require('../errors/ForbiddenError');
 const IncorrectError = require('../errors/IncorrectError');
 
 const getCards = (req, res, next) => {
-  Card.find({})
-    .then((data) => res.send(data))
+  Card.find()
+    .then((card) => res.send(card))
     .catch((err) => next(err));
 };
 
