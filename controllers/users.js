@@ -11,9 +11,8 @@ const login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
       res.send({ token });
-    }).catch((err) => {
-      next(err);
-    });
+    })
+    .catch(next);
 };
 
 const getUserInfo = (req, res, next) => {
