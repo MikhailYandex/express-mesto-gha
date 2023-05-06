@@ -14,11 +14,10 @@ const createCard = (req, res, next) => {
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.send(card))
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        next(new IncorrectError('Некорректные данные'));
-      } else {
-        next(err);
+      if (err.name === 'ValidationError') {
+        return next(new IncorrectError('Некорректные данные'));
       }
+      return next(err);
     });
 };
 
@@ -37,10 +36,9 @@ const deleteCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new IncorrectError('Некорректный id карточки'));
-      } else {
-        next(err);
+        return next(new IncorrectError('Некорректный id карточки'));
       }
+      return next(err);
     });
 };
 
@@ -52,10 +50,9 @@ const addCardLike = (req, res, next) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new IncorrectError('Некорректный id карточки'));
-      } else {
-        next(err);
+        return next(new IncorrectError('Некорректный id карточки'));
       }
+      return next(err);
     });
 };
 
@@ -67,10 +64,9 @@ const removeCardLike = (req, res, next) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new IncorrectError('Некорректный id карточки'));
-      } else {
-        next(err);
+        return next(new IncorrectError('Некорректный id карточки'));
       }
+      return next(err);
     });
 };
 

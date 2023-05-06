@@ -10,15 +10,15 @@ const login = (req, res, next) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-      res.send({ token });
+      return res.send({ token });
     })
-    .catch(next);
+    .catch((err) => next(err));
 };
 
 const getUserInfo = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => res.send(user))
-    .catch(next);
+    .catch((err) => next(err));
 };
 
 const getUsers = (req, res, next) => {
@@ -46,12 +46,12 @@ const createUser = (req, res, next) => {
         })
         .catch((err) => {
           if (err.code === 11000) {
-            next(new AlreadyExistsError('Данный профиль уже существует'));
-          } else if (err.name === 'ValidationError') {
-            next(new IncorrectError('Некорректные данные'));
-          } else {
-            next(err);
+            return next(new AlreadyExistsError('Данный профиль уже существует'));
           }
+          if (err.name === 'ValidationError') {
+            return next(new IncorrectError('Некорректные данные'));
+          }
+          return next(err);
         });
     });
 };
@@ -64,10 +64,9 @@ const findUser = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new IncorrectError('Не корректный id пользователя'));
-      } else {
-        next(err);
+        return next(new IncorrectError('Не корректный id пользователя'));
       }
+      return next(err);
     });
 };
 
@@ -80,10 +79,9 @@ const updateProfile = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new IncorrectError('Не корректные данные'));
-      } else {
-        next(err);
+        return next(new IncorrectError('Не корректные данные'));
       }
+      return next(err);
     });
 };
 
@@ -96,10 +94,9 @@ const updateAvatar = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new IncorrectError('Не корректные данные'));
-      } else {
-        next(err);
+        return next(new IncorrectError('Не корректные данные'));
       }
+      return next(err);
     });
 };
 
