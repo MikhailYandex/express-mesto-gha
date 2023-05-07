@@ -1,10 +1,12 @@
 const Card = require('../models/card');
+
 const NotFoundError = require('../errors/NotFoundError');
-const ForbiddenError = require('../errors/ForbiddenError');
 const IncorrectError = require('../errors/IncorrectError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
 const getCards = (req, res, next) => {
   Card.find({})
+    .populate('owner')
     .then((cards) => res.send(cards))
     .catch((err) => next(err));
 };
@@ -22,7 +24,7 @@ const createCard = (req, res, next) => {
 };
 
 const deleteCard = (req, res, next) => {
-  Card.findById(req.params.id)
+  Card.findById(req.params.cardId)
     .orFail(() => {
       throw new NotFoundError('Данная карточка не существует');
     })
